@@ -71,21 +71,6 @@ namespace BikeStore
             }
             
         }
-        public static void AddCustomer(string personNr, string name, string city, string street, string zipCode, string email, string password)
-        {
-            using (var db = new BikeStoreContext())
-            {
-                db.AddRange(
-                    new Customer
-                    {
-                        PersonNummer = personNr,
-                        Name = name,
-                        City = city,
-                        Street = street
-                    });
-                db.SaveChanges();
-            }
-        }
         public static void AddCustomer(Customer customer)
         {
             using (var db = new BikeStoreContext())
@@ -172,29 +157,6 @@ namespace BikeStore
                 {
                     productList.Remove(scrapProduct);
                 }
-                db.SaveChanges();
-            }
-        }
-        public static void AddCart(Cart cart)
-        {
-            using (var db = new BikeStoreContext())
-            {
-                db.Add(cart);
-                db.SaveChanges();
-            }
-        }
-        public static void AddProduct(string name, int categoryId, decimal? price, int stock)
-        {
-            using (var db = new BikeStoreContext())
-            {
-                db.AddRange(
-                    new Product
-                    {
-                        Name = name,
-                        CategoryId = categoryId,
-                        Price = price,
-                        Stock = stock
-                    });
                 db.SaveChanges();
             }
         }

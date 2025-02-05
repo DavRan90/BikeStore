@@ -16,7 +16,7 @@ namespace BikeStore
         static string connString = "data source=.\\SQLEXPRESS; initial catalog=BikeStore1; " +
             "TrustServerCertificate=true; persist security info=True; Integrated Security=True";
 
-        //Azure
+        // Azure
         //static string connString = "Server=tcp:daradb1.database.windows.net,1433;Initial Catalog = daradb1; Persist Security Info=False;User ID = daraad; Password=Qchpw9pc;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout = 30;";
 
         public static Models.Product GetProduct(int id)
@@ -52,22 +52,6 @@ namespace BikeStore
         public static void UpdateStockAfterPurchase(int purchasedAmount, int productId)
         {
             string sql = $"UPDATE Products SET Stock -= {purchasedAmount} WHERE ID = {productId}";
-
-            using (var connection = new SqlConnection(connString))
-            {
-                connection.Query(sql);
-            }
-        }
-        public static void QueryOrders(int customerId)
-        {
-            string sql = $"SELECT " +
-                        $"O.Id as OrderID, P.Name AS Produkt, P.Price AS Pris, OD.Quantity AS Antal, O.OrderDate AS Beställningsdatum" +
-                        $"FROM Products P" +
-                        $"JOIN OrderDetails OD" +
-                        $"ON P.Id = OD.ProductId" +
-                        $"JOIN Orders O" +
-                        $"ON OD.OrderId = O.Id" +
-                        $"WHERE O.CustomerID = {customerId};";
 
             using (var connection = new SqlConnection(connString))
             {

@@ -10,6 +10,9 @@ using BikeStore.Models;
 
 namespace BikeStore
 {
+    /// <summary>
+    /// Class for drawing the elements and changes to the store
+    /// </summary>
     internal class Draw
     {
 

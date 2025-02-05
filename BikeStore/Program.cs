@@ -53,10 +53,11 @@ namespace BikeStore
                             Console.ReadKey();
                         }
                         break;
-                    case 'w':
-                    case 'W':
-                        Draw.ShowOrders(customer);
-                        break;
+                    // Some shortcuts to functionality for testing
+                    //case 'w':
+                    //case 'W':
+                    //    Draw.ShowOrders(customer);
+                    //    break;
                     //case 'z':
                     //    Draw.ShowShipping(customer);
                     //    break;

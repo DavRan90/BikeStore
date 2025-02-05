@@ -31,10 +31,11 @@ public partial class BikeStoreContext : DbContext
 
     public virtual DbSet<Product> Products { get; set; }
 
+    // Lokalt
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         => optionsBuilder.UseSqlServer("Server=.\\SQLExpress;Database=BikeStore1;Trusted_Connection=True;TrustServerCertificate=true");
 
-    //Azure
+    // Azure
     //protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     //    => optionsBuilder.UseSqlServer("Server=tcp:daradb1.database.windows.net,1433;Initial Catalog=daradb1;Persist Security Info=False;User ID=daraad;Password=Qchpw9pc;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;");
 

@@ -103,7 +103,7 @@ namespace BikeStore
                     cartList.Add($"{selectedItem,-5} {item.Amount,-8} {product.Name,-25} {String.Format("{0:###,###.00}", product.Price),-19}");
                     cartSum += product.Price * item.Amount;
                 }
-                cartList.Add("_______________________________________________________"); // Kanske lägga till en rad för pris - moms
+                cartList.Add("_______________________________________________________");
 
                 cartList.Add($"{"",-14} {"Total",-25} {String.Format("{0:###,###.00}", cartSum),-19}");
                 cartSum = (cartSum * 75) / 100; // utan moms
@@ -120,20 +120,40 @@ namespace BikeStore
                 {
                     Console.SetCursorPosition(12, 14 + cartIndex);
                     var productsInCart = DatabasDapper.GetCartList(customer.Id);
-                    Cart cartItem = productsInCart[cartIndex - 1];
-                    bool numberInput = int.TryParse(Console.ReadLine(), out int amountSelect);
-                    if (numberInput && amountSelect == 0) // Remove product from cart
+                    if (productsInCart.Count >= cartIndex)
                     {
-                        DatabasDapper.RemoveProductFromCart(customer.Id, int.Parse(cartItem.ProductId));
+                        Cart cartItem = productsInCart[cartIndex - 1];
+                        Product product = DatabasDapper.GetProduct(int.Parse(cartItem.ProductId));
+                        bool numberInput = int.TryParse(Console.ReadLine(), out int amountSelect);
+                        if (numberInput && amountSelect == 0) // Remove product from cart
+                        {
+                            DatabasDapper.RemoveProductFromCart(customer.Id, int.Parse(cartItem.ProductId));
+                        }
+                        else if (amountSelect >= product.Stock)
+                        {
+                            ResetLowerBar();
+                            Console.ForegroundColor = ConsoleColor.Red;
+                            Console.Write("Not enough in stock");
+                            Console.ForegroundColor = ConsoleColor.White;
+                            Thread.Sleep(800);
+                        }
+                        else if (numberInput && amountSelect > 0)
+                        {
+                            DatabasDapper.ModifyQuantity(customer.Id, int.Parse(cartItem.ProductId), amountSelect);
+                        }
+                        //else
+                        //{
+                        //    return;
+                        //}
                     }
-                    else if (numberInput && amountSelect > 0)
+                    else
                     {
-                        DatabasDapper.ModifyQuantity(customer.Id, int.Parse(cartItem.ProductId), amountSelect);
+                        ResetLowerBar();
+                        Console.ForegroundColor = ConsoleColor.Red;
+                        Console.Write("Invalid ID");
+                        Console.ForegroundColor = ConsoleColor.White;
+                        Thread.Sleep(800);
                     }
-                    //else
-                    //{
-                    //    return;
-                    //}
                 }
                 else if (input.KeyChar == 'K' || input.KeyChar == 'k' && selectedItem > 0)
                 {
@@ -358,7 +378,17 @@ namespace BikeStore
             }
             else if (int.TryParse(addOrDelete, out int categoryId))
             {
-                Db.RemoveCategory(categoryId);
+                try
+                {
+                    Db.RemoveCategory(categoryId);
+                }
+                catch
+                {
+                    ResetLowerBar();
+                    Console.ForegroundColor = ConsoleColor.Red;
+                    Console.Write("Category contains products");
+                    Console.ForegroundColor = ConsoleColor.White;
+                }
             }
             else
             {
@@ -383,9 +413,18 @@ namespace BikeStore
             ShowPage();
             ShowLoggedInUser(customer.Name);
             ShowCartBanner(customer.Id);
+            
             var category = DatabasDapper.GetCategory(categoryId);
-            SetTitle(category.Name);
+            if(category.Id > 0)
+            {
+                SetTitle(category.Name);
+            }
+            else
+            {
+                SetTitle("Invalid category ID");
+            }
             var categorisedProducts = DatabasDapper.GetProducts(categoryId);
+
 
             List<string> productsByCategory = new List<string>();
 
@@ -629,10 +668,18 @@ namespace BikeStore
                 string input = Console.ReadLine();
                 if (input == "j" || input == "J")
                 {
-                    Db.AddProduct(newProduct);
-                    //ShowPage();
-                    //ShowCategoriesList();
-                    //ShowProducts();
+                    try
+                    {
+                        Db.AddProduct(newProduct);
+                    }
+                    catch
+                    {
+                        ResetLowerBar();
+                        Console.ForegroundColor = ConsoleColor.Red;
+                        Console.Write("Invalid entry");
+                        Console.ForegroundColor = ConsoleColor.White;
+                        Thread.Sleep(500);
+                    }
                     addProduct = true;
                 }
                 else if (input == "n" || input == "N")
@@ -1116,12 +1163,21 @@ namespace BikeStore
                         index -= 1; // för att få rätt index
                         if (input.KeyChar == 'j' || input.KeyChar == 'J')
                         {
-                            ResetLowerBar();
-                            Console.ForegroundColor = ConsoleColor.Green;
-                            Console.Write($"Vara {index + 1}, {featuredProducts[index].Name} borttagen");
-                            Console.ForegroundColor = ConsoleColor.White;
-                            Db.RemoveFeaturedProduct(featuredProducts[index].Id);
-                            invalidChoice = false;
+                            //try
+                            //{
+                                ResetLowerBar();
+                                Console.ForegroundColor = ConsoleColor.Green;
+                                Console.Write($"Vara {index + 1}, {featuredProducts[index].Name} borttagen");
+                                Console.ForegroundColor = ConsoleColor.White;
+                                Db.RemoveFeaturedProduct(featuredProducts[index].Id);
+                                invalidChoice = false;
+                            //}
+                            //catch
+                            //{
+                            //    ResetLowerBar();
+                            //    Console.Write("Ogilitgt ID");
+                            //}
+                            
                         }
                     }
                     else if (inp == "")

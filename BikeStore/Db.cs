@@ -122,15 +122,27 @@ namespace BikeStore
         {
             using (var db = new BikeStoreContext())
             {
-                
-                db.Add(
-                    new Cart
+                bool productExistsInCart = false;
+                foreach (var cart in db.Carts)
+                {
+                    if (cart.UserId == userId && int.Parse(cart.ProductId) == product.Id)
                     {
-                        ProductId = product.Id.ToString(),
-                        UserId = userId,
-                        Amount = 1
-                    });
+                        productExistsInCart = true;
+                        cart.Amount += 1;
+                    }
+                }
                 db.SaveChanges();
+                if (productExistsInCart == false)
+                {
+                    db.Add(
+                        new Cart
+                        {
+                            ProductId = product.Id.ToString(),
+                            UserId = userId,
+                            Amount = 1
+                        });
+                    db.SaveChanges();
+                }
             }
         }
         public static void RemoveCategory(int id)

@@ -83,8 +83,16 @@ namespace BikeStore
                         bool isNum = int.TryParse(input.KeyChar.ToString(), out int inputAsInt);
                         if (isNum)
                         {
-                            Draw.ShowPage();
-                            Draw.ShowCategoryPage(inputAsInt, customer);
+                            try
+                            {
+                                Draw.ShowPage();
+                                Draw.ShowCategoryPage(inputAsInt, customer);
+                            }
+                            catch
+                            {
+                                Draw.ResetLowerBar();
+                                Console.Write("Invalid ID");
+                            }
                         }
                         else
                         {

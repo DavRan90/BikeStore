@@ -13,11 +13,11 @@ namespace BikeStore
     internal class DatabasDapper
     {
         // Lokalt
-        //static string connString = "data source=.\\SQLEXPRESS; initial catalog=BikeStore1; " +
-        //    "TrustServerCertificate=true; persist security info=True; Integrated Security=True";
+        static string connString = "data source=.\\SQLEXPRESS; initial catalog=BikeStore1; " +
+            "TrustServerCertificate=true; persist security info=True; Integrated Security=True";
 
         //Azure
-        static string connString = "Server=tcp:daradb1.database.windows.net,1433;Initial Catalog = daradb1; Persist Security Info=False;User ID = daraad; Password=Qchpw9pc;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout = 30;";
+        //static string connString = "Server=tcp:daradb1.database.windows.net,1433;Initial Catalog = daradb1; Persist Security Info=False;User ID = daraad; Password=Qchpw9pc;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout = 30;";
 
         public static Models.Product GetProduct(int id)
         {
@@ -247,8 +247,15 @@ namespace BikeStore
             {
                 category = connection.QuerySingleOrDefault<Category>(sql);
             }
-
-            return category;
+            if (category != null)
+            {
+                return category;
+            }
+            else
+            {
+                category = new Category();
+                return category;
+            }
         }
         public static Customer SignInAsGuest()
         {

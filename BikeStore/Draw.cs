@@ -101,7 +101,7 @@ namespace BikeStore
                 int selectedItem = 0;
                 foreach (var item in cart)
                 {
-                    var product = DatabasDapper.GetProduct(int.Parse(item.ProductId));
+                    var product = DatabasDapper.GetProduct((int)item.ProductId);
                     selectedItem++;
                     cartList.Add($"{selectedItem,-5} {item.Amount,-8} {product.Name,-25} {String.Format("{0:###,###.00}", product.Price),-19}");
                     cartSum += product.Price * item.Amount;
@@ -126,11 +126,11 @@ namespace BikeStore
                     if (productsInCart.Count >= cartIndex)
                     {
                         Cart cartItem = productsInCart[cartIndex - 1];
-                        Product product = DatabasDapper.GetProduct(int.Parse(cartItem.ProductId));
+                        Product product = DatabasDapper.GetProduct((int)cartItem.ProductId);
                         bool numberInput = int.TryParse(Console.ReadLine(), out int amountSelect);
                         if (numberInput && amountSelect == 0) // Remove product from cart
                         {
-                            DatabasDapper.RemoveProductFromCart(customer.Id, int.Parse(cartItem.ProductId));
+                            DatabasDapper.RemoveProductFromCart(customer.Id, (int)cartItem.ProductId);
                         }
                         else if (amountSelect >= product.Stock)
                         {
@@ -142,12 +142,8 @@ namespace BikeStore
                         }
                         else if (numberInput && amountSelect > 0)
                         {
-                            DatabasDapper.ModifyQuantity(customer.Id, int.Parse(cartItem.ProductId), amountSelect);
+                            DatabasDapper.ModifyQuantity(customer.Id, (int)cartItem.ProductId, amountSelect);
                         }
-                        //else
-                        //{
-                        //    return;
-                        //}
                     }
                     else
                     {
@@ -220,7 +216,7 @@ namespace BikeStore
             int selectedItem = 0;
             foreach (var item in cart)
             {
-                var product = DatabasDapper.GetProduct(int.Parse(item.ProductId));
+                var product = DatabasDapper.GetProduct((int)item.ProductId);
                 selectedItem++;
                 cartList.Add($"{selectedItem,-5} {item.Amount,-8} {product.Name,-25} {String.Format("{0:###,###.00}", product.Price),-19}");
                 orderDetail = new OrderDetail { ProductId = product.Id, UnitPrice = product.Price, Quantity = item.Amount };
@@ -832,12 +828,22 @@ namespace BikeStore
                                 if (password == confirmPassword)
                                 {
                                     customer.Password = password;
-                                    Db.AddCustomer(customer);
-                                    ResetLowerBar();
-                                    Console.Write($"{"Konto skapat! "}");
-                                    DatabasDapper.UpdateCartOwner(1, customer.Id); // Convert guest cart to user cart
-                                    Thread.Sleep(1000);
-                                    ShowShipping(customer);
+                                    try
+                                    {
+                                        Db.AddCustomer(customer);
+                                        ResetLowerBar();
+                                        Console.Write($"{"Konto skapat! "}");
+                                        DatabasDapper.UpdateCartOwner(1, customer.Id); // Convert guest cart to user cart
+                                        Thread.Sleep(1000);
+                                        ShowShipping(customer);
+                                    }
+                                    catch
+                                    {
+                                        ResetLowerBar();
+                                        Console.Write("Account creation failed");
+                                        Console.ReadKey();
+                                    }
+                                    
 
                                     invalidInput = false;
                                 }

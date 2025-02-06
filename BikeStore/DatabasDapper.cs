@@ -10,6 +10,9 @@ using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
 
 namespace BikeStore
 {
+    /// <summary>
+    /// Class to interact with database through SQL(Dapper)
+    /// </summary>
     internal class DatabasDapper
     {
         // Lokalt

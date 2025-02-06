@@ -8,6 +8,10 @@ using BikeStore.Models;
 
 namespace BikeStore
 {
+
+    /// <summary>
+    /// Class for interacting with the database through EF
+    /// </summary>
     internal class Db
     {
         public static void RemoveFeaturedProduct(int id)
@@ -55,7 +59,7 @@ namespace BikeStore
         }
         public static Order AddOrder(Order order)
         {
-            using(var db = new BikeStoreContext())
+            using (var db = new BikeStoreContext())
             {
                 db.Add(order);
                 db.SaveChanges();
@@ -69,7 +73,7 @@ namespace BikeStore
                 db.Add(orderDetail);
                 db.SaveChanges();
             }
-            
+
         }
         public static void AddCustomer(Customer customer)
         {
@@ -107,27 +111,15 @@ namespace BikeStore
         {
             using (var db = new BikeStoreContext())
             {
-                bool productExistsInCart = false;
-                foreach (var cart in db.Carts)
-                {
-                    if (cart.UserId == userId && int.Parse(cart.ProductId) == product.Id)
+                db.Add(
+                    new Cart
                     {
-                        productExistsInCart = true;
-                        cart.Amount += 1;
-                    }
-                }
+                        ProductId = product.Id,
+                        UserId = userId,
+                        Amount = 1
+                    });
                 db.SaveChanges();
-                if (productExistsInCart == false)
-                {
-                    db.Add(
-                        new Cart
-                        {
-                            ProductId = product.Id.ToString(),
-                            UserId = userId,
-                            Amount = 1
-                        });
-                    db.SaveChanges();
-                }
+
             }
         }
         public static void RemoveCategory(int id)
@@ -151,8 +143,8 @@ namespace BikeStore
             {
                 var productList = db.Products;
                 var scrapProduct = (from c in productList
-                                            where c.Id == id
-                                            select c).SingleOrDefault();
+                                    where c.Id == id
+                                    select c).SingleOrDefault();
                 if (scrapProduct != null)
                 {
                     productList.Remove(scrapProduct);
